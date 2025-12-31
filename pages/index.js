@@ -1,9 +1,15 @@
 // pages/index.js
 import Head from "next/head";
-import { useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image"; // ⬅️ add this
 
-const HERO_BG_URL = "/images/mts-bg-2.jpg";
+const STEAM_URL =
+  "https://store.steampowered.com/app/4245220/Mega_Trons_Survivors/";
+
+const toPublicImageUrl = (filename) => `/images/${filename}`;
+
+const HERO_BG_FILENAME = "ChatGPT Image Dec 30, 2025, 01_29_40 PM.png";
+const HERO_BG_URL = toPublicImageUrl(HERO_BG_FILENAME);
 
 const gameSchema = {
   "@context": "https://schema.org",
@@ -22,39 +28,12 @@ const gameSchema = {
   applicationCategory: "Game",
 };
 
-export default function HomePage() {
+export default function HomePage({ galleryImages }) {
   const jsonLd = JSON.stringify(gameSchema);
-
-  // Log on render (SSR + client)
-  console.log("[HomePage] Rendering with hero background:", HERO_BG_URL);
-
-  // Preload image + log result in browser console
-  useEffect(() => {
-    console.log("[Hero] Pre-loading hero background image:", HERO_BG_URL);
-
-    if (typeof window === "undefined") {
-      console.log("[Hero] Skipping hero image preload on server.");
-      return;
-    }
-
-    const img = new window.Image();
-    img.src = HERO_BG_URL;
-
-    img.onload = () => {
-      console.log("[Hero] Hero background loaded OK:", {
-        width: img.width,
-        height: img.height,
-        src: img.src,
-      });
-    };
-
-    img.onerror = (err) => {
-      console.error("[Hero] FAILED to load hero background image:", {
-        src: img.src,
-        error: err,
-      });
-    };
-  }, []);
+  const mediaImages =
+    Array.isArray(galleryImages) && galleryImages.length > 0
+      ? galleryImages
+      : [{ src: HERO_BG_URL, alt: "Mega Trons Survivors artwork" }];
 
   return (
     <>
@@ -161,6 +140,9 @@ export default function HomePage() {
               <a href="#systems" className="hover:text-cyan-300 transition">
                 Systems
               </a>
+              <a href="#media" className="hover:text-cyan-300 transition">
+                Media
+              </a>
               <a href="#roadmap" className="hover:text-cyan-300 transition">
                 Roadmap
               </a>
@@ -171,7 +153,9 @@ export default function HomePage() {
 
             <div className="flex items-center gap-3">
               <a
-                href="#wishlist"
+                href={STEAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hidden rounded-full border border-cyan-400/60 bg-black/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-cyan-200 shadow-[0_0_15px_rgba(34,211,238,0.5)] hover:bg-cyan-500/10 hover:text-cyan-100 md:inline-flex"
               >
                 Wishlist on Steam
@@ -187,11 +171,17 @@ export default function HomePage() {
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
           >
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${HERO_BG_URL})` }}
+            <Image
+              src={HERO_BG_URL}
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
             />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),transparent_55%),radial-gradient(circle_at_bottom,_rgba(244,114,182,0.12),transparent_60%)]" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/75 to-black/40" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/35 to-[#020617]" />
           </div>
 
           {/* Constrained content on top */}
@@ -221,7 +211,7 @@ export default function HomePage() {
 
               <div className="flex flex-wrap items-center gap-4">
                 <a
-                  href="https://store.steampowered.com" // TODO: update to real Steam URL
+                  href={STEAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-cyan-400/70 bg-cyan-500/10 px-6 py-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-100 shadow-[0_0_25px_rgba(34,211,238,0.75)] transition hover:bg-cyan-400/20"
@@ -277,7 +267,7 @@ export default function HomePage() {
                       <div className="absolute inset-4 rounded-2xl border border-slate-800 overflow-hidden">
                         <div
                           className="absolute inset-0 bg-cover bg-center"
-                          style={{ backgroundImage: `url(${HERO_BG_URL})` }}
+                          style={{ backgroundImage: `url("${HERO_BG_URL}")` }}
                         />
                         <div className="absolute inset-0 bg-black/55" />
                         <div className="relative z-10 flex h-full items-center justify-center px-4">
@@ -332,6 +322,30 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* MEDIA / CAROUSEL */}
+        <section
+          id="media"
+          className="mx-auto max-w-6xl px-6 pb-20 pt-4 lg:pb-24"
+        >
+          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-cyan-300">
+                Media
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-slate-50 sm:text-3xl">
+                Screenshots, concept art, and neon vibes.
+              </h2>
+            </div>
+            <p className="max-w-xl text-xs leading-relaxed text-slate-300">
+              Swipe through the latest captures and concept art from the grid.
+              Real gameplay footage and screenshots will rotate in as
+              development progresses.
+            </p>
+          </div>
+
+          <MediaCarousel images={mediaImages} />
         </section>
 
         {/* FEATURES */}
@@ -512,7 +526,7 @@ export default function HomePage() {
                   to back.
                 </p>
                 <a
-                  href="https://store.steampowered.com" // TODO: update to real Steam URL
+                  href={STEAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center rounded-full border border-cyan-400/70 bg-cyan-500/10 px-6 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-cyan-100 shadow-[0_0_24px_rgba(34,211,238,0.7)] hover:bg-cyan-400/20"
@@ -581,6 +595,9 @@ export default function HomePage() {
               <a href="#features" className="hover:text-cyan-300">
                 Features
               </a>
+              <a href="#media" className="hover:text-cyan-300">
+                Media
+              </a>
               <a href="#newsletter" className="hover:text-cyan-300">
                 Uplink
               </a>
@@ -590,4 +607,139 @@ export default function HomePage() {
       </main>
     </>
   );
+}
+
+function MediaCarousel({ images }) {
+  const safeImages = Array.isArray(images) ? images.filter(Boolean) : [];
+  const total = safeImages.length;
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  if (total === 0) return null;
+
+  const normalizedIndex = ((activeIndex % total) + total) % total;
+  const active = safeImages[normalizedIndex];
+  const goPrev = () =>
+    setActiveIndex((current) => (current - 1 + total) % total);
+  const goNext = () => setActiveIndex((current) => (current + 1) % total);
+
+  return (
+    <div
+      className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950/80 via-black/70 to-slate-950/70 p-[1px]"
+      aria-roledescription="carousel"
+    >
+      <div className="rounded-3xl bg-black/60">
+        <div
+          className="relative aspect-[16/9] overflow-hidden rounded-3xl"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") goPrev();
+            if (event.key === "ArrowRight") goNext();
+          }}
+        >
+          <Image
+            src={active.src}
+            alt={active.alt}
+            fill
+            sizes="(max-width: 1024px) 100vw, 1024px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),transparent_55%),radial-gradient(circle_at_bottom,_rgba(244,114,182,0.12),transparent_60%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/35" />
+
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-black/70 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-slate-200 shadow-[0_0_18px_rgba(34,211,238,0.25)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(34,211,238,0.9)]" />
+              {normalizedIndex + 1} / {total}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={goPrev}
+                className="rounded-full border border-slate-700 bg-black/70 px-3 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-slate-200 hover:border-cyan-400/50 hover:text-cyan-200"
+                aria-label="Previous image"
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                className="rounded-full border border-slate-700 bg-black/70 px-3 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-slate-200 hover:border-cyan-400/50 hover:text-cyan-200"
+                aria-label="Next image"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-3 overflow-x-auto px-4 pb-4 pt-4">
+          {safeImages.map((img, idx) => {
+            const isActive = idx === normalizedIndex;
+            return (
+              <button
+                key={`${img.src}-${idx}`}
+                type="button"
+                onClick={() => setActiveIndex(idx)}
+                className={`relative h-16 w-28 flex-none overflow-hidden rounded-xl border bg-black/50 transition ${
+                  isActive
+                    ? "border-cyan-400/80 shadow-[0_0_20px_rgba(34,211,238,0.35)]"
+                    : "border-slate-800 hover:border-cyan-400/40"
+                }`}
+                aria-label={`Show image ${idx + 1}`}
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="112px"
+                  className="object-cover"
+                />
+                <div
+                  aria-hidden="true"
+                  className={`absolute inset-0 ${
+                    isActive ? "bg-cyan-500/10" : "bg-black/20"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export async function getStaticProps() {
+  const imagesDir = "public/images";
+  let filenames = [];
+
+  try {
+    const { readdir } = await import("node:fs/promises");
+    const path = await import("node:path");
+    const absImagesDir = path.join(process.cwd(), imagesDir);
+    filenames = await readdir(absImagesDir);
+  } catch (error) {
+    console.warn("[HomePage] Failed to read images directory:", imagesDir, error);
+  }
+
+  const imageFiles = filenames
+    .filter((filename) => /\.(png|jpe?g|webp|avif)$/i.test(filename));
+
+  imageFiles.sort((a, b) => {
+    if (a === HERO_BG_FILENAME) return -1;
+    if (b === HERO_BG_FILENAME) return 1;
+    return a.localeCompare(b);
+  });
+
+  const galleryImages = imageFiles.map((filename, index) => ({
+    src: toPublicImageUrl(filename),
+    alt: `Mega Trons Survivors media ${index + 1}`,
+  }));
+
+  return {
+    props: {
+      galleryImages,
+    },
+  };
 }
