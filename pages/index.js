@@ -11,6 +11,14 @@ const toPublicImageUrl = (filename) => `/images/${filename}`;
 const HERO_BG_FILENAME = "ChatGPT Image Dec 30, 2025, 01_29_40 PM.png";
 const HERO_BG_URL = toPublicImageUrl(HERO_BG_FILENAME);
 
+const YOUTUBE_VIDEOS = [
+  {
+    id: "Y8OjIXiEy-A",
+    title: "Mega Trons Survivors Gameplay",
+  },
+  { id: "vAe2u7HmGjQ", title: "Mega Trons Survivors Trailer" },
+];
+
 const gameSchema = {
   "@context": "https://schema.org",
   "@type": "VideoGame",
@@ -140,6 +148,9 @@ export default function HomePage({ galleryImages }) {
               <a href="#systems" className="hover:text-cyan-300 transition">
                 Systems
               </a>
+              <a href="#trailers" className="hover:text-cyan-300 transition">
+                Trailers
+              </a>
               <a href="#media" className="hover:text-cyan-300 transition">
                 Media
               </a>
@@ -220,10 +231,13 @@ export default function HomePage({ galleryImages }) {
                   <span>Wishlist on Steam</span>
                 </a>
 
-                <button className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-black/60 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-slate-100 hover:border-cyan-400/50 hover:text-cyan-100">
+                <a
+                  href="#trailers"
+                  className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-black/60 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.25em] text-slate-100 hover:border-cyan-400/50 hover:text-cyan-100"
+                >
                   <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
                   Watch gameplay trailer
-                </button>
+                </a>
               </div>
 
               <div className="grid max-w-lg grid-cols-3 gap-4 pt-4 text-[0.7rem] uppercase tracking-[0.18em] text-slate-400">
@@ -321,6 +335,67 @@ export default function HomePage({ galleryImages }) {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* TRAILERS */}
+        <section
+          id="trailers"
+          className="mx-auto max-w-6xl px-6 pb-20 pt-4 lg:pb-24"
+        >
+          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-cyan-300">
+                Trailers
+              </p>
+              <h2 className="mt-2 text-2xl font-bold text-slate-50 sm:text-3xl">
+                See the grid in motion.
+              </h2>
+            </div>
+            <p className="max-w-xl text-xs leading-relaxed text-slate-300">
+              Two quick looks at Mega Trons Survivors—combat flow, neon arenas,
+              and the overpowered build fantasy.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {YOUTUBE_VIDEOS.map((video) => (
+              <article
+                key={video.id}
+                className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-950/80 via-black/70 to-slate-950/70 p-[1px]"
+              >
+                <div className="rounded-3xl bg-black/60">
+                  <div className="relative aspect-[16/9] overflow-hidden rounded-3xl">
+                    <iframe
+                      src={`https://www.youtube-nocookie.com/embed/${video.id}?rel=0`}
+                      title={video.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-3 px-5 py-4">
+                    <div>
+                      <p className="text-[0.6rem] font-semibold uppercase tracking-[0.26em] text-slate-400">
+                        YouTube
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-slate-100">
+                        {video.title}
+                      </p>
+                    </div>
+                    <a
+                      href={`https://www.youtube.com/watch?v=${video.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full border border-cyan-400/60 bg-black/70 px-4 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-cyan-200 hover:bg-cyan-500/10 hover:text-cyan-100"
+                    >
+                      Open
+                    </a>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -595,6 +670,9 @@ export default function HomePage({ galleryImages }) {
               <a href="#features" className="hover:text-cyan-300">
                 Features
               </a>
+              <a href="#trailers" className="hover:text-cyan-300">
+                Trailers
+              </a>
               <a href="#media" className="hover:text-cyan-300">
                 Media
               </a>
@@ -720,11 +798,16 @@ export async function getStaticProps() {
     const absImagesDir = path.join(process.cwd(), imagesDir);
     filenames = await readdir(absImagesDir);
   } catch (error) {
-    console.warn("[HomePage] Failed to read images directory:", imagesDir, error);
+    console.warn(
+      "[HomePage] Failed to read images directory:",
+      imagesDir,
+      error
+    );
   }
 
-  const imageFiles = filenames
-    .filter((filename) => /\.(png|jpe?g|webp|avif)$/i.test(filename));
+  const imageFiles = filenames.filter((filename) =>
+    /\.(png|jpe?g|webp|avif)$/i.test(filename)
+  );
 
   imageFiles.sort((a, b) => {
     if (a === HERO_BG_FILENAME) return -1;
